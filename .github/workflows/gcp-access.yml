@@ -1,0 +1,30 @@
+name: GCP OIDC Access
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  access-gcp:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: 'projects/48994678794/locations/global/workloadIdentityPools/iam-lab-7-gh-pool/providers/iam-lab-7-gh-pool-oidc-provider'
+        service_account: 'iam-lab-7-target@gcp-labs-9necgia2.iam.gserviceaccount.com'
+        
+    - name: Setup gcloud
+      uses: google-github-actions/setup-gcloud@v1
+      
+    - name: Access Secret
+      run: |
+        echo "Accessing secret..."
+        gcloud secrets versions access latest --secret="flag_iam_lab_7" --project="gcp-labs-9necgia2"
